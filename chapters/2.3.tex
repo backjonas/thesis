@@ -1,0 +1,51 @@
+\subsection{Client-side storage}
+\label{sec:background-storage}
+
+In web applications that execute code on the client, storing data in the client browser is often required.
+The use of JavaScript allows developers to store data in variables, making it possible to keep track of application state and to create more complex programs.
+It is often useful to persist data over different sessions, and as JavaScript variables are cleared when refreshing the page, other methods for storing data are needed.
+A common use case for persistent storage methods is keeping track of users by storing a session token in the client browser, allowing authenticated users to navigate a web page without having to authenticate every time they visit a new page.
+
+\subsubsection{Cookies}
+\label{sec:background-storage-cookies}
+Cookies have long been used to allow servers to store state at HTTP user agents, such as web browsers, over the HTTP protocol, which itself is mostly stateless.
+Cookies function by passing data in HTTP headers.
+By using the Set-Cookie field, servers can pass name/value pairs and related metadata to user agents.
+In later requests, the user agent can set a previously stored value in the Cookie field, allowing the server to identify the client or to keep track of user preferences.
+Cookies are not always suitable for keeping track of user state or identifiers.
+Using cookies, a server cannot differentiate between different sessions for one user.
+As an example, if a user had two separate windows open at the same time and was trying to purchase two different items, the session would leak between the two windows \citep{noauthor_html_nodate}.
+Cookies are also limited by their max size, which is 4096 bytes.
+
+When setting cookies, the server can define the scope of the cookie, which can include the domain and path of the cookie, as well as if it should be allowed to be used in HTTP requests that do not use TLS
+\citep{barth_rfc6265_2011}.
+The use of scope for cookies is essential if it contains confidential information such as session identifiers.
+If a domain is not defined for the cookie, the value could be read by any visited website, significantly increasing the chance for session hijacking.
+Similarly, if the cookie is allowed to be used without TLS, any network attacker would be able to read the transmitted data.
+To limit many vulnerabilities, such as cross-site scripting (XSS) attacks, the \textit{HttpOnly} flag can be set for cookies that are used as session identifiers.
+The flag blocks access to the cookie from JavaScript executed in the client, only allowing it to be sent as part of a request in the Cookie header.
+
+To further protect against cross-site attacks, the \textit{SameSite} attribute can be used \citep{khodayari_state_2022}.
+Three different \textit{SameSite}  policies exist: None, Lax and Strict.
+A cookie with the None policy is attached to all outgoing requests, which includes cross-site requests.
+Cookies with the Lax policy are attached to same-site requests as well as cross-site requests with safe HTTP methods, which includes using the HTTP GET method and the request resulting from a top-level navigation by the user, such as clicking on a link.
+Cookies with the Strict policy are only included on requests that originated from the same origin.
+As such, if a user clicks a link to a site on a page with some other origin, the cookie will not be included.
+
+\subsubsection{Web storage API}
+The web storage API was created to deal with some of the issues of cookies.
+The API includes two mechanisms for storing data, session storage and local storage \citep{noauthor_html_nodate}.
+Both storage methods allow persisting data for longer periods of time, while also separating the storage by domain.
+As data is unencrypted at rest, the web storage API is inherently insecure.
+Additionally, web storage is vulnerable to a number of attacks, such as XSS attacks, requiring developers to implement additional security features and considering what kind of data to store.
+Due to these security concerns, web storage should not be used to store any sensitive data.
+Session storage persists data for the lifetime of the session, keeping the data through page navigations and refreshes until the browser or tab is closed \citep{noauthor_web_2023}.
+Local storage persists data over multiple sessions, having to be explicitly cleared by using JavaScript or by clearing all browser storage.
+
+
+%\begin{itemize}
+%    \item IndexedDB?
+%    \item cache?
+%    \item Storing in files on the client?
+%    \item service worker?
+%\end{itemize}

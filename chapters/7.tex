@@ -1,0 +1,28 @@
+\clearpage
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+This thesis studied common vulnerabilities of systems using OAuth 2.0 and presented methods that can be used to mitigate these issues.
+The motivation behind the study was the widespread use of OAuth and the lax nature of the standard, allowing clients to be implemented with very different levels of security.
+The goal of the thesis was to identify common vulnerabilities in OAuth systems and demonstrate how a client can be implemented securely.
+
+A number of common vulnerabilities in OAuth clients and authorization servers were described, in addition to steps that can be taken to mitigate the vulnerabilities.
+The studied vulnerabilities can be divided into two categories: vulnerabilities caused by incorrect authorization server or client implementations and vulnerabilities in OAuth systems that implement the bare minimum required by the specification.
+Incorrect handling of the authorization code redirect is shown to be a common source for vulnerabilities, such as the redirect URI attack which is made possible by systems not implementing exact URI matching for the redirect URI and the HTTP 307 attack, which is enabled by authorization servers sending the original request body in the redirect response.
+Vulnerabilities that are caused by systems implementing the bare minimum of the OAuth specification are most commonly related to not using the state parameter and authorization servers allowing unencrypted web traffic, either to their own authorization endpoint or when redirecting back to the client.
+
+The practical client implementation of the study shows that implementing a secure OAuth client is simple, as long as a few crucial details are implemented correctly.
+While the client is implemented using certain tools and frameworks, the implementation is simple enough that it should be possible to translate the logic to any language or framework of choice.
+The client implementation also showed that developers can outsource a significant amount of complexity related to user authentication to third parties that provide authorization servers.
+While the steps needed to implement a secure OAuth client are not complex, the lax nature of the OAuth specification makes it easy for developers to make insecure decisions if they are not familiar with the technologies used.
+
+Many of the mitigations were shown to be simple and inexpensive to implement, with the OAuth specification describing a significant portion of the security enhancing techniques.
+Techniques that are outside of the OAuth 2.0 specification, such as PKCE, are similarly shown to be simple and effective at preventing many vulnerabilities.
+Due to how easy many of these mitigations are to implement, it is not obvious why they are not mandatory.
+While a more secure specification will still have to be implemented correctly by developers, explicitly requiring more secure processes should help limit the number of vulnerabilities found in real world applications.
+
+
+
+%% In a thesis, every section/chapter starts a new page, hence the \clearpage
+\clearpage

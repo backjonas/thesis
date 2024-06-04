@@ -1,0 +1,16 @@
+\clearpage
+\section{The OAuth 2.0 specification}
+OAuth is an authorization framework that implements token-based authentication.
+In the context of OAuth, it is necessary to clarify the difference between authentication and authorization.
+Authorization is the process of determining whether an entity can access a resource.
+Authentication on the other hand aims to identify an entity.
+Authentication is a prerequisite for authorization, as an entity has to be securely identified for access control to be relevant \citep{kim_authentication_2017}.
+
+Version 1.0 of the specification was released in 2010 \citep{hammer-lahav_oauth_2010}, and the current latest version, 2.0, was released in 2012 \citep{hardt_oauth_2012}.
+As version 1.0 of the spec is obsolete, this thesis will only consider OAuth 2.0.
+This section gives an overview of the specification, describing the different roles and identifiers as well as different grant types, with a focus on the authorization code grant.
+The OAuth specification defines four separate flows: the authorization code grant and implicit grant that are used to get a new access token, the refresh flow that is used to refresh an existing access token and the introspection request which is used to get information about an existing access token.
+
+\input{chapters/3.1}
+\input{chapters/3.2}
+\input{chapters/3.3}

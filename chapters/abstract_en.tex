@@ -1,0 +1,11 @@
+\begin{abstractpage}[english]
+The OAuth 2.0 specification is widely used to authorize applications to use resources belonging to third parties and to enable single sign-on across multiple applications.
+While the technology is widely used, the lax nature of the specification leaves plenty of different options for developers looking to implement the specification, enabling different OAuth systems to have very different security characteristics.
+As third-party OAuth authorization servers are often utilized by developers that might have limited knowledge of the technology and might thus be unaware of the security implications of their choices, this thesis aims to present known vulnerabilities in OAuth systems, and demonstrates simple steps that should be taken to securely implement the specification.
+
+This thesis presents a number of vulnerabilities of varying severity that are common in real-world systems utilizing OAuth.
+These vulnerabilities are often caused by incorrect implementation of OAuth clients and authorization servers, but the lax nature of the specification allowing the creation of insecure applications if only the bare minimum of the specification is implemented is an equally common source for vulnerabilities.
+Through a practical client implementation utilizing third-party authorization servers, this thesis shows that a number of simple steps can be taken to mitigate many of the described vulnerabilities, often at a minimal development and performance cost and without a significant increase in complexity.
+It is however not always obvious if the most secure option is the optimal choice for a specific system, such as when deciding if and how to persist user sessions, as a more secure option might lead to a deterioration in user experience.
+To help developers adapt the OAuth specification to their specific application according to their security requirements, this thesis presents the impact of different design choices and shows why taking extra precautions is often worth the effort.
+\end{abstractpage}

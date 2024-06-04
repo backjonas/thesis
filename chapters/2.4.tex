@@ -1,0 +1,38 @@
+\subsection{Authenticating HTTP requests}
+As internet-facing applications can be accessed by anyone, it is often necessary to authenticate entities trying to communicate with the application.
+Authentication can be used for limiting access to only certain users or to display user-specific information.
+As the authenticated entities can vary from human users to devices or other servers, different ways of authentication can be appropriate for different systems.
+In a traditional web application with a client, a backend and a database, the authenticated parties are typically the client when communicating with the backend and the backend when communicating with the database.
+
+The need for authenticating HTTP requests has existed since the early days of the internet, with the basic HTTP authentication scheme being an early method \citep{reschke_basic_2015}. 
+Basic authentication functions by sending an authorization header with a base64-encoded string containing a username and password, which the server can use to identify the user, by comparing the string with a stored value, which should be encrypted at rest.
+Notably, the scheme does not provide any confidentiality for credentials, as the credentials are not encrypted or hashed in any way, allowing for the base64 value to be easily decoded.
+While the encryption of headers in TLS prevents outside attackers in the network from reading the credentials, this lack of confidentiality allows the receiving server to access the plain text credentials.
+This allows hostile or compromised servers to capture credentials which can be used on other sites in the case of credential reuse.
+A 2014 study by Das et al. found that 43\% of users directly reuse passwords on different sites \citep{das_tangled_2014}.
+With these issues and the prevalence of password reuse in mind, the basic HTTP scheme can no longer be considered appropriate for many web applications.
+
+Human-readable passwords are not always required, and in many cases API keys can be appropriate for authenticating clients \citep{farrell_api_2009}.
+API keys differ from basic authentication by only identifying users by a single secret string that is shared between the client and server, instead of a string and a username.
+As developers can define the authentication string freely, it could in theory be constructed similarly to the string used in basic authentication.
+In practice, the API key is often a completely random string, with the server keeping a track of who the string belongs to if required.
+The API key can also be a hashed string similar to the one used in basic authentication, allowing the storage of a user identifier and password without the risk of leaking either the password or the user identifier.
+Similarly to basic authentication, API keys are sent in a request header, often using the X-API-KEY header.
+The API key could also be sent as a query parameter or in the request body itself depending on the implementation.
+API keys are especially useful if the server does not need to differentiate between clients, if there are a small number of clients or if the client is not a user-facing web client, such as a backend server communicating with an external API.
+While API keys mitigate some of the risks associated with sending unencrypted passwords over the internet, they suffer from many of the same flaws as basic authentication.
+Similarly to basic authentication, the API key is the same for each request and as such it only has to be leaked once for attackers to gain unapproved access.
+While systematically rotating API keys can lower the risk of the API keys leaking, they are not optimal for all use cases today.
+
+Both of the described authentication schemes share the weaknesses of requiring servers to store the user identifiers and reusing the same identifier for an unspecified amount of time.
+Servers also have to implement the authentication logic separately, leaving room for poor implementations and suboptimal credential storage.
+Token-based authentication has become a popular way to outsource the authentication logic to a trusted third party.
+Token-based authentication functions by redirecting the user to an identity provider (IdP) which authenticates the user and grants a token identifying the user \citep{hardt_oauth_2012}.
+A token can be a random string with sufficient length to make it unlikely for a third party to be able to guess it.
+A token can contain some information about the user, but it can also be completely opaque.
+The client can store this authentication token and send it with any future request, typically as a cookie (described in section \ref{sec:background-storage-cookies}), allowing servers to verify the user by querying the IdP with the user token.
+Compared to the static API key, authentication tokens are typically only valid for a short amount of time, mitigating the risk of credential hijacking.
+To remove the need for users to log in continuously, access tokens can often be refreshed silently in the background by the client application.
+
+
+

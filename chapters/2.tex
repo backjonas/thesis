@@ -1,0 +1,20 @@
+%% In a thesis, every section/chapter starts a new page, hence the \clearpage
+\clearpage
+
+\section{Background}
+\label{sec:background}
+
+This section gives an overview of the areas that are required to evaluate the security of an OAuth system.
+Since the OAuth specification deals with transmitting sensitive data over the internet, the first section describes how network communication can be secured, with details on public key encryption and Transport Layer Security.
+The second section describes the structure of web applications, considering the different implementation options that are available today as well as their security considerations.
+To be able to evaluate different methods for storing OAuth user identifiers, the third section details the different options that are available for storing data in web clients.
+The fourth section describes different methods that can be used to authenticate HTTP communication.
+The fifth section describes cross-site request forgery attacks, which is a common attack type that is especially relevant in the context of OAuth.
+
+
+\input{chapters/2.1}
+\input{chapters/2.2}
+\input{chapters/2.3}
+\input{chapters/2.4}
+\input{chapters/2.5}
+

@@ -1,0 +1,18 @@
+\clearpage
+
+\section{Implementing an OAuth client}
+\label{sec:implementation}
+This chapter describes a practical implementation for an OAuth 2.0 client using an authorization server provided by a third party.
+The central design choices are described in addition to their effect on the security of the system.
+The OAuth client consists of a minimal frontend application that interacts with an API backend which handles all communication with the authorization server.
+The backend supports using multiple authorization servers simultaneously, with the example implementing authorization using Google and Microsoft accounts.
+The focus of the chapter lies on the authorization code flow, as the process of retrieving an access token is the most critical part of an OAuth system.
+It should also be possible to implement the authorization code flow in a similar way as in the example for a wide variety of different applications.
+The chapter briefly describes token introspection and token refreshing, but as their implementation will vary greatly between different applications, they are not described in detail.
+The complete source code for the client can be found on GitHub \citep{noauthor_backjonasoauth-client_nodate}.
+ 
+
+\input{chapters/5.1}
+\input{chapters/5.2}
+\input{chapters/5.3}
+\input{chapters/5.4}

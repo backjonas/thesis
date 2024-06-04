@@ -1,0 +1,24 @@
+\subsection{Cross-site request forgery}
+Cross-site request forgery (CSRF) is an attack where an attacker causes a victim's browser to perform an unwanted operation on a trusted website.
+CSRF attacks rely on the fact that stored user sessions belonging to a specific domain tend to be included automatically in all HTTP requests to the domain.
+As such, if the victim is tricked to click a link to the target site with some malicious payload, such as a form submission to update a password, the victim's browser will automatically include the victim's session in the request, allowing the attacker to perform operations as the victim.
+A typical CSRF attack has the goal of gaining access to resources belonging to the victim \citep{lin_threat_2009}.
+This can give attackers access to private resources belonging to the victim or allow attackers to impersonate the victim.
+By forging a request that signs the victim in as the attacker to a legitimate site, a victim can be tricked to perform operations as the attacker in \citep{barth_robust_2008}.
+These login CSRF attacks are more difficult to defend against than traditional CSRF attacks but can be equally damaging.
+An attacker could for example trick the victim to store a payment method in the attackers account.
+
+CSRF attacks can be performed using a number of methods that all rely on somehow causing the victim's browser to visit a link provided by the attacker.
+In an ideal case for the attacker, the vulnerable route is a HTTP form that allows the attacker to perform an operation as the victim, such as transferring money or changing account passwords.
+On a website with user-generated content, such as a forum, attackers could embed malicious links in images.
+For malicious images to be executed on page load the site will need to have a vulnerable route where a HTTP GET request executes an operation with side-effects.
+According to the HTTP specification, GET requests should be free of side effects, but it is up to developers to correctly implement the specification.
+If a victim visits a malicious site controlled by the attacker, the malicious site can instruct the user's browser to execute any HTTP request to the vulnerable site.
+Compared to the malicious embedded images, the target site does not need to have any wrongly configured routes that execute GET requests with side-effects, as the attacker can freely choose the type of HTTP request.
+
+As the potential for CSRF attacks have been known for many years, a number of well-known defenses exist.
+Bart et al. (2008) suggest protecting against CSRF attacks by using secret validation tokens \citep{barth_robust_2008}.
+A secret validation token is a random value that is included by applications in each HTTP request to ensure that requests have been sent from an authorized source.
+The token should be hard to guess for attackers that do not already have access to the victim's account.
+As the token will have to be stored in the client, end users will be able to access it with ease in many cases.
+As such, the token should never be shared between user or sessions, and should ideally be treated as a single-use nonce to make replay attacks less likely.

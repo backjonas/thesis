@@ -1,0 +1,26 @@
+\subsection{Token storage}
+\label{sec:implementation-storage}
+As described in section \ref{sec:background-storage}, a number of options exist for storing data in web browsers.
+The most secure storage solution for an OAuth client would be to temporarily store tokens in JavaScript, with closures providing some additional security.
+Such a solution would not however provide any persistence, and as such the end user would have to authenticate every time they start a new browser session.
+To improve the user experience, the example client persists the access tokens, allowing users to stay logged in across multiple sessions.
+When choosing to persist data developers have two practical options: the web storage API and cookies.
+Due to its vulnerability to XSS attacks, the web storage API is not an optimal solution for storing sensitive information.
+We instead opt for cookies to store any client-specific information when obtaining an access token, described in section \ref{sec:implementation:access-token}.
+
+Many cookie flags that improve the storage security, described in section \ref{sec:background-storage}, are essential when storing sensitive data such as access tokens.
+The cookies are marked as \textit{HttpOnly}, causing the cookies to be included in requests while keeping them completely inaccessible for the frontend application.
+Instead, only the backend application can set and modify the cookies.
+Any sensitive cookies should also be marked as \textit{Secure}, causing them to only be included in HTTPS requests.
+This is a critical flag to include, as any network attacker could intercept sensitive cookies in transit if they are included in regular HTTP traffic.
+Cookies should also have an appropriate \textit{SameSite} value.
+The state, code verifier and provider should be stored with the \textit{Lax} SameSite policy, as they are accessed in a request that is initiated from the authorization server.
+The access token and refresh token should instead be stored with the \textit{Strict} policy, as it does not need to be included in requests with any external origin.
+
+To further limit the possibility of sensitive tokens leaking, tokens can be encrypted before storage.
+Since all communication with the authorization server in an OAuth client with a separate frontend and backend flows through the backend server, the end user does not need access to the original, unencrypted access token, code verifier or OAuth provider.
+If all the values stored in the client are encrypted, an attacker is unable to steal the original tokens.
+The provided security benefit from this is however quite limited, as the client backend will accept and decrypt any token, without any way to verify if it was stolen or not.
+Instead, the encrypted cookies have a greater impact on the authorization code flow, as modifying the temporarily stored state, code verifier or OAuth provider is more difficult.
+An attacker is required to interact with the backend client themselves to obtain modified values that are encrypted with the correct key, allowing the client to limit what type of values are generated.
+This also makes it easier to investigate malicious activity, since the attacker has to interact with the legitimate client to pull off any attack.

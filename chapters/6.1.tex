@@ -1,0 +1,52 @@
+\subsection{Client implementation options}
+\label{sec:discussion-client-options}
+When implementing an OAuth client, the security of two clients that both adhere to the OAuth 2.0 specification can be very different.
+This is mainly due to the specification being quite lenient, with a significant portion of security-enhancing features defined as optional or recommended.
+While this does have the benefit of allowing developers to create very simple OAuth clients that still adhere to the specification, the varying security can be misleading for end users that are likely to assume that all single sign-on systems are created equal.
+
+\subsubsection{OAuth authorization flows}
+A general design principle for our OAuth client is to do as much in the client backend as possible, as opposed to in the frontend.
+While the frontend is a SPA and could thus do almost everything the backend does, every frontend operation has to consider the possibility that it could be tampered with by an attacker.
+Keeping the frontend implementation as simple as possible also makes it easier to translate the logic to other languages or frameworks if required.
+As described in section \ref{sec:implementation}, the separate client backend also allows keeping values secret from the end user, which is required to implement the authorization code flow, which should be wherever possible instead of the less secure implicit grant.
+
+The authorization code flow requires the client to generate random values for the state and code verifier.
+Generating random values is a very common problem with a number of viable solutions.
+Our client uses the \textit{randomBytes} function from the \textit{crypto} module to generate these random values \citep{noauthor_crypto_nodate}.
+The \textit{crypto} module has the benefit of being included in Node.Js by default, without requiring any additional third-party libraries.
+The widespread use of the library also makes it more likely that any vulnerabilities are found and patched promptly.
+The code challenge could also be sent in plain text, so that the code challenge and code verifier are the same string.
+If possible, the code challenge should however be a hashed version of the code verifier.
+The Node.Js \textit{crypto} module contains a function for generating the hash as well, \textit{createHash}, which is used in our client, using the SHA256 algorithm.
+While authorization servers can choose to support other hashing algorithms, they are only required to support SHA256 and plain text code challenges \citep{rfc7636}.
+
+Both the frontend and backend keep track of the used authorization server by using separate paths for separate providers.
+The provider could be provided as a query parameter as well, with no impact on the security of the system.
+It is however simpler to keep track of the provider in the path, as the authorization server redirect contains data as query parameters, which could potentially cause clashes with any additional data stored using the same parameters.
+Other options are not available, such as sending the provider in the request body, as the provider has to be contained in the redirect URI sent to the authorization server.
+By additionally storing the provider as a cookie, the backend server can confirm that the initial login request was using the provider that the user believes they are using when approving the login on the consent page.
+This is necessary, as a user could be redirected to the confirmation page from any server with any parameters, legitimate or malicious, with no way to confirm where the redirect request originated.
+
+The additional user consent screen is mainly intended as a defense mechanism against IdP mix-up attacks and CSRF attacks.
+CSRF attacks generally rely on users clicking a link which has unintended side effects, such as causing the user to submit a form with the values as query parameters in the link.
+While the client frontend does not have a form that can be submitted to initiate the login request, a link to the backend server with the correct URI would cause the user to be redirected to an authorization server.
+As such, it has to be considered that the user could be redirected to the redirect URI defined in the authorization code request without ever knowingly agreeing to sign in.
+Since the allowed redirect URIs have to be defined for each authorization server, if each provider has separate callback paths, a sign-in request from a legitimate authorization server can only redirect to their own callback path.
+While it is still possible for an attacker to redirect a user to this confirmation page with malicious parameters, such as a code belonging to the attacker, the backend server should be able to catch these attacks by verifying the state and code verifier values.
+The state and code verifier values created in the initial code request are only stored in the client's browser, and due to them being single-origin, the backend server must have set the cookies if they are able to read them.
+If an attacker crafts a malicious link to request an access token based on the attacker's code, both the state and the code verifier checks will fail.
+Additionally, since authorization servers should perform exact URI comparisons to verify that a redirect URI is allowed, an attacker is unable to embed any malicious content in the redirect URI itself.
+
+
+\subsubsection{Persisting OAuth tokens}
+While the improvements in user experience are clear when persisting access tokens using some client-side storage method, such as cookies in our example, long-time storage of tokens does make the system less secure.
+While cookies marked as \textit{HttpOnly} are not accessible from applications running in the client browser, the end user is able to access them in the browser.
+Any token that is stored runs the risk of falling into the wrong hands, which is why many critical applications, such as online banks, often do not allow users to stay logged in between multiple sessions.
+Access tokens do mitigate this risk of leaking somewhat by being relatively short lived.
+
+Refresh tokens are however not short lived, and as described in section \ref{sec:discussion-server-security}, authorization servers often allow refresh tokens to be used to request multiple access tokens, without having an expiration time for the refresh token.
+As such, refresh tokens make the system less secure.
+Furthermore, if refresh tokens are stored in the same place as access tokens, as is done in our OAuth client example, the benefits of having an expiration time on the access tokens are not realized, as it is equally likely for the refresh token and access token to be leaked, while the refresh token can be valid for a longer time increasing the chance that an attacker is able to exploit it.
+This implies that refresh tokens should not be stored in cookies together with the access token, and in our client example this could be achieved by storing the refresh token in the client backend, which should limit the chance for these tokens to be leaked.
+This immediately raises the requirements for developers and system administrators, as they are now responsible for implementing a secure storage method for these sensitive tokens.
+This mitigates one of the main benefits of utilizing third party authorization servers, which is the lowered requirements for a developer wishing to implement a secure authorization system.

@@ -1,0 +1,20 @@
+\subsection{Proof Key for Code Exchange}
+\label{sec:pkce}
+To protect against authorization code injection, the OAuth 2.0 Security Best Current Practice \citep{ietf-oauth-security-topics-27} recommends using Proof Key for Code Exchange (PKCE) to bind authorization codes to client instances \citep{rfc7636}.
+
+PKCE relies on creating a code verifier in the initial authorization code request (step 2 in figure \ref{client_auth_requests}).
+The code verifier should be a random string with between 43 and 128 characters.
+This code verifier should be temporarily stored by the client.
+In our example client, the value is stored as a cookie in the user's browser.
+After generating the code verifier, the client generates a code challenge by hashing the code verifier.
+The code challenge should be generated using the SHA256 algorithm \citep{dang_secure_2015} if possible.
+The generated code challenge is sent to the authorization server together with the code request.
+The used code challenge method, such as \textit{S256} if SHA256 is used, is also included in the request.
+
+After receiving the authorization code, the OAuth client requests an access token from the authorization server (step 6 in figure \ref{client_auth_requests}).
+The original code verifier is included in the access token request.
+The authorization server computes a code challenge based on the verifier and the previously sent challenge method and compares it with the initial code challenge.
+If the two code challenge values do not match, the authorization server interrupts the access token generation.
+
+
+

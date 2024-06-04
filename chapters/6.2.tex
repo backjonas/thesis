@@ -1,0 +1,65 @@
+\subsection{Observations from utilizing third-party authorization servers}
+\label{sec:observations}
+A clear benefit of the OAuth 2.0 protocol is that it removes many complicated technical details from application developers, allowing them to rely on an established and trusted third party to implement the critical sign-in logic, leaving less room for mistakes.
+For this benefit to materialize, the application developers should be able to find information on how clients can be implemented securely.
+Additionally, as the third parties are trusted to implement the sign-in system securely, their authorization servers should be implemented correctly and securely.
+This section describes the developer experience of using authorization servers provided by Google and Microsoft, with notes on how securely they are implemented.
+
+\subsubsection{Quality of documentation}
+\label{sec:observations-documentation}
+Since developers using third party authorization servers might not be familiar with OAuth best practices, it is essential that documentation and examples show secure implementations.
+As discussed in chapters \ref{sec:vulnerabilities} and \ref{sec:implementation}, a developer implementing an OAuth client has to make a number of decisions that have a significant impact on the security of the system.
+Some of the areas where developers can make decisions that impact the system security are the choice of authorization flow, the use of state and PKCE and the use of refresh tokens.
+
+As discussed in sections \ref{sec:background-oauth-code} and \ref{sec:background-oauth-implicit}, the authorization code flow should be preferred over the implicit grant flow whenever possible due to the greatly improved security.
+Despite this, the Google documentation for client-side web applications state that the implicit grant flow is the only viable option for such clients \citep{noauthor_oauth_clientside}.
+In contrast, Microsoft's version of the same documentation clearly states that the implicit grant flow is not a suitable authentication method today, and even states that existing applications using the implicit grant flow should migrate to using the authorization code flow\citep{owenrichards1_microsoft_2024}.
+
+When utilizing the authorization code flow, using the state value is a simple way to protect against a number of attacks, as discussed in section \ref{sec:vulnerabilities-state}.
+As such, it is a positive sign that both studied documentation sets recommend using the state value, and that the state value is included in example requests.
+While the inclusion of the state value is positive, neither of the used documentation sets actually explain how or where the state value should be verified, leaving some room for improvement.
+
+Similarly to the recommended authorization flow, Google and Microsoft seem to have a very different view on the importance of PKCE.
+In the case of Google, PKCE is only described in their documentation for mobile and desktop applications \citep{noauthor_oauth_desktop}, while it is completely absent from their documentation for web servers \citep{noauthor_oauth_server}.
+Even in the desktop documentation where PKCE is described, it is completely missing from the example requests, leaving it up to the developer to figure out how and where the \textit{code\_challenge} and \textit{code\_verifier} values should be included.
+Microsoft's documentation on the other hand does describe PKCE, and the relevant parameters are included in the example requests.
+Additionally, the Microsoft documentation recommends using PKCE for all application types and requires its use for single page applications that use the authorization code flow.
+
+\subsubsection{Authorization server security}
+\label{sec:discussion-server-security}
+When choosing to use third-party authorization servers, developers rely on these third parties to securely implement the services.
+Since the OAuth 2.0 specification is quite lax, an authorization server that complies with the specification can have a number of known vulnerabilities.
+Details on how authorization servers are implemented are provided below, based on observations from utilizing Microsoft's and Google's authorization servers and the vulnerabilities listed in section \ref{sec:vulnerabilities-server}.
+
+Supporting the use of state is essential when implementing secure OAuth clients.
+As such, it is a positive note that the investigated authorization servers support the state parameter, and have implemented it correctly.
+The state parameter is however optional, leaving room for developers to implement insecure clients.
+While the state parameter is described as optional in the OAuth specification, authorization servers could encourage more secure practices by requiring users to provide a state value.
+The state support does however leave room for improvement, as the servers do not support invalidating a code if a state validation fails.
+While this code invalidation is not described in the OAuth specification, it does provide clear security benefits, as a failure to validate the state should only occur as a result of an error or some malicious activity.
+As the authorization codes are single-use, this invalidation could be implemented by requesting and immediately invalidating an access token, but a more direct option would be useful.
+
+Due to the distributed nature of the internet, sensitive traffic should never be sent without encryption.
+Since OAuth deals with sign-in logic and user credentials, there is no reason why any of the communication should use plain HTTP.
+Microsoft and Google seem to agree, since all their endpoints force clients to use HTTPS.
+Microsoft also forces redirect URIs to use HTTPS, only allowing for localhost addresses to use plain HTTP.
+Google does however allow using HTTP for non-local redirect URIs.
+Since authorization codes and access tokens are sent to the redirect URI, any network attacker that is able to intercept the traffic would be able to read this sensitive data in plain-text.
+
+Section \ref{sec:vulnerabilities-server} also discusses a number of other redirect-related vulnerabilities.
+Both of the studied authorization servers correctly mitigate these vulnerabilities.
+The HTTP 307 redirect vulnerability relies on authorization servers incorrectly redirecting the request body, potentially allowing clients to receive user credentials.
+While both studied authorization servers use HTTP 302 instead of the 303 code recommended by Fett et al. (2016) \citep{fett_comprehensive_2016}, the body is correctly removed from the redirect response.
+The redirect URI attack relies on authorization servers not performing exact redirect URI matching when comparing provided redirect URIs with the list of allowed URIs, such as only comparing the origin.
+Both studied authorization servers do perform exact URI matching, and as such they are not vulnerable to the attack.
+
+Insecure handling of tokens is another common source for vulnerabilities in authorization servers.
+The studied authorization servers correctly implement authorization codes by only allowing them to be used once.
+The validity times for the access tokens are also appropriate, with both the access tokens of both providers being valid for one hour.
+Both providers do however implement refresh tokens in a less secure manner.
+Ideally, refresh tokens should have a similar expiration time as access tokens, requiring clients to periodically renew the token to keep it valid.
+Additionally, refresh tokens should be single use, with authorization servers returning the next refresh token in the access token refresh response.
+Instead, both providers issue refresh tokens that do not expire.
+Additionally, the same refresh token can be used to request multiple access tokens.
+Due to these implementation choices, the risk for session hijacking is increased significantly due to old leaked refresh tokens still being valid.
+On a positive note, the authorization servers do correctly invalidate refresh tokens when the related access token is invalidated.

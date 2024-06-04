@@ -1,0 +1,26 @@
+\subsection{Identifiers}
+The OAuth specification utilizes a number of tokens and other identifiers that are used to identify resource owners and clients.
+\begin{itemize}
+    \item \textbf{Authorization code} \\
+    The authorization code is granted by an authorization server to a client after the server has successfully authenticated the resource owner.
+    The authorization code is a random string, and it does not typically contain any data in itself.
+    The authorization code is used by the client to request an access token from the authorization server.
+    As the authorization code should only be used once to request an access token, it must only be valid for one request and must be short-lived.
+    If an authorization code is used multiple times, the authorization server should revoke all tokens that have been generated using the code.
+    In the implicit code grant, an authorization code is not used, with the authorization server issuing an access token directly instead.
+    \item \textbf{Access token} \\
+    Access tokens are strings which are used to grant access for a specific client to a specific resource server.
+    The token additionally includes a scope for the granted access, making it possible to grant granular access to resources.
+    To mitigate the chance for leaked tokens being abused, the token can be given an expiration time.
+    Access tokens and related attributes have to be kept confidential in transit and storage.
+    Access tokens should only be shared between the client it is issued to, the authorization server that creates the token and the resource server which the token is valid for.
+    It must not be possible for unauthorized parties to generate, modify or guess valid access tokens.
+    \item \textbf{Refresh token} \\
+    Refresh tokens are strings which are used to request additional access tokens.
+    Refresh tokens are created simultaneously with access tokens, and are useful when the access token has an expiry time set, allowing for end-users to stay authenticated for a longer period of time if the client stays active by refreshing new access tokens before the previous token expires.
+    The refresh logic is typically performed in the background by the client, causing minimal interruption for end-users.
+    When granting a new access token from a refresh token, the authorization server can issue a new refresh token, allowing for multiple refreshes for one authorization.
+    Refresh tokens and related attributes have to be kept confidential in transit and storage.
+    Refresh tokens should only be shared between the client it is issued to, the authorization server that creates the token and the resource server which the token is valid for.    
+\end{itemize}
+

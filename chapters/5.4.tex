@@ -1,0 +1,10 @@
+\subsection{Explicit user intention tracking}
+To protect against CSRF attacks and IdP mix-up attacks, described in sections \ref{sec:vulnerabilities-state} and \ref{sec:vulnerabilities-idp}, additional controls should be used to keep track of user actions.
+To alleviate these issues, the authorization code flow described in figure \ref{client_auth_requests} contains some additional checks that are not mandatory in the OAuth 2.0 authorization code flow described in figure \ref{oauth_code_flow}.
+The chosen provider is tracked in each step, with separate routes for separate providers to limit the chance for a mix-up.
+Additionally, the original chosen provider is stored as a cookie, allowing the client to validate that the actual used provider is the same as the provider chosen by the user.
+
+Step 5 of figure \ref{client_auth_requests}  is also added as an extra guard against CSRF and IdP mix-up attacks.
+The redirect via the frontend prompting for user consent is not required to request an access token, which could be handled completely in the backend.
+It is however useful as a prompt for the user to confirm that they intend to sign in to the page, and that they chose to sign in with a specific provider.
+If the step was missing, it is possible that an attacker could craft a CSRF request that signs in the user as the attacker, or that signs in the user using the wrong authorization server.

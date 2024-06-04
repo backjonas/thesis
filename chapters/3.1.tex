@@ -1,0 +1,24 @@
+\subsection{Roles}
+The abstract authorization flow of the OAuth specification defines four separate roles:
+
+\begin{itemize}    
+    \item \textbf{Resource owner} \\
+    The resource owner is an entity that can grant access to a protected resource. Can be referred to as an end user if it is a person.
+    \item \textbf{Resource server} \\
+    The resource server hosts the protected resource and can accept and respond to access requests using access tokens.
+    \item \textbf{Client} \\
+    The client is an application requesting a protected resource on behalf of the resource owner. The client can be implemented freely and can be run on any type of device.
+    The OAuth specification defines two types of clients, confidential and public.
+    Confidential clients are clients that can securely store their credentials, such as clients implemented on secure servers with restricted access.
+    Public clients are clients that are unable to securely store their credentials, such as clients executing in web-browsers or natively on the end user's device.
+    The identity of the client should be verified by the authorization server where possible.
+    The client credentials should be kept secret to avoid malicious clients impersonating the client.
+    If client authentication is not possible, the authorization server should only allow redirection to specific URIs, which can prevent delivering tokens to counterfeit clients.
+    Public clients are required to define their allowed redirect URIs.
+    Confidential clients should also define their allowed redirect URIs but can choose not to.
+    \item \textbf{Authorization server} \\
+    The server issues access tokens to the client after authenticating the resource owner. The authorization server can be the same entity as the resource server, but the interaction between these entities is not defined in the specification.
+    The authorization server must use TLS for all requests sent to the authorization or token endpoints to prevent man-in-the-middle attacks.
+    The client is required to validate the authorization server's TLS certificate.
+    The authorization server can also be referred to as a provider.
+\end{itemize}

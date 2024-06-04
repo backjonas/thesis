@@ -1,0 +1,49 @@
+\section{Introduction}
+\label{sec:intro}
+
+%% Leave page number of the first page empty
+%% 
+\thispagestyle{empty}
+
+In recent years, single sign-on (SSO) systems have become common, allowing users to authenticate using one centralized account.
+SSO systems can help secure user authentication by mitigating password fatigue and password reuse \citep{dhamija_seven_2008}, in addition to creating a more convenient user experience by removing the need for the user to authenticate on each web application separately.
+Additionally, SSO systems remove the need for each web application to implement their own authentication system, allowing a smaller number of centralized actors with the required resources to implement the systems securely.
+
+OAuth 2.0 is an open standard that is commonly used by SSO systems that allow users to share information about their account with third parties, allowing the third party to use the SSO system to authenticate their users \citep{fett_comprehensive_2016}.
+The OAuth specification defines how authorization servers function and how they should be interacted with.
+The specification does not however define how the client interacting with the authorization server should be implemented, leaving room for potential developer mistakes and unintended vulnerabilities.
+The popularity of OAuth makes it a tempting attack vector, further increasing the chance that any vulnerabilities in the client implementation will be exploited.
+
+\subsection{Problem statement}
+
+The OAuth 2.0 specification is widely used today.
+The specification is however not very strict, leaving plenty of room for developers to implement the system as they like.
+While this does enable a wide variety of systems to utilize OAuth, it means that two different systems implementing the same specification might not be as secure.
+As the specification is quite well studied, a number of common vulnerabilities are known, with well defined defenses.
+Some of these defenses are described as recommendations in the OAuth specification, while other solutions might only be described in third-party sources.
+
+As SSO-systems are typically used by developers to lower the required amount of logic needed to implement authentication, it is not only essential that it is easy to implement an OAuth client, but that it is easy to implement a secure client.
+There are a number of different options that are available when implementing an OAuth client, and it is important to consider the security implications of these decisions.
+While the specification might allow certain implementation options, understanding the negative effect on the system's security should help developers consider other options, leading to a more secure system.
+Multiple widely used open-source OAuth clients  exist, but their implementations can vary significantly and the motivation behind their choices is not always well defined.
+Additionally, the OAuth clients are often implemented by and for a specific identity provider, forcing developers to implement their own client or combining multiple clients if they want to support multiple providers.
+Different client platforms also come with specific security considerations; this thesis will however focus on JavaScript-based web clients.
+
+This thesis aims to achieve the following objectives:
+\begin{enumerate}
+    \item \textbf{Identify common vulnerabilities in OAuth clients} \\
+    To be able to securely implement OAuth-based authentication, it is essential to understand common vulnerabilities, both in OAuth clients and authorization servers.
+    \item \textbf{Demonstrate a secure client implementation} \\
+    The second objective is to implement a secure OAuth web-client using JavaScript and to demonstrate how the previously shown vulnerabilities are mitigated.
+\end{enumerate}
+
+\subsection{Structure of the thesis}
+
+Chapter 2 offers an overview of relevant technologies when inspecting the security of OAuth web clients, 
+providing information on how web traffic is secured and how web applications are typically structured.
+Chapter 3 gives an overview of the OAuth 2.0 specification and describes how it can be used to authenticate users.
+Chapter 4 investigates common vulnerabilities in OAuth systems.
+Chapter 5 presents a JavaScript-based OAuth client which attempts to mitigate the vulnerabilities found in chapter 4.
+Chapter 6 discusses the implementation of chapter 5 and how it takes the vulnerabilities of chapter 4 into account. The chapter also lists observations from utilizing a third-party authorization server, focusing on the quality of documentation as well as on how the authorization servers have been implemented.
+Chapter 7 summarizes the key results of the study.
+

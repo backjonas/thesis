@@ -1,0 +1,14 @@
+\clearpage
+
+\section{Vulnerabilities in OAuth systems}
+\label{sec:vulnerabilities}
+
+The OAuth protocol does not strictly define how systems utilizing the protocol should be implemented, requiring developers to thoroughly consider the security of their implementation choices.
+When inspecting the security of OAuth systems, the critical components are the client and the authorization server.
+Poorly implemented OAuth systems are very common, with Philippaerts et al. (2022) finding some vulnerability in each inspected authorization server \citep{philippaerts_oauch_2022}.
+Client implementations are not any more secure, with Yang et al. (2016) finding simple mistakes in a majority of inspected web applications \citep{yang_model-based_2016}.
+As these vulnerabilities are obvious enough to be found with automated methods, an attacker is very likely to find them as well.
+
+
+\input{chapters/4.1}
+\input{chapters/4.2}

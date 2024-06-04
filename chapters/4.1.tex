@@ -1,0 +1,63 @@
+\subsection{Vulnerabilities in authorization servers}
+\label{sec:vulnerabilities-server}
+As the authorization server is a trusted entity in the OAuth authorization flows, it is essential that it is securely implemented.
+In addition to following general best practices for server management, such as keeping systems up to date, developers should consider OAuth-specific vulnerabilities.
+To avoid on-path attackers, TLS should be used for all communication with the authorization server.
+To lower the chance of developer mistakes, clients should be forced to use TLS for all communication with the authorization server.
+
+\subsubsection{HTTP 307 redirect}
+In the redirection-based authentication flows of the OAuth specification, how the redirections are implemented can have a significant impact on the overall security of the system.
+While the choice of HTTP status code used for redirection is seen as an implementation detail in the OAuth specification, the status code used should be chosen carefully.
+In contrast with other types of redirects, if the 307 HTTP status code is used as redirection, the body of the original POST request can be redirected.
+If the authorization server uses HTTP 307 to redirect users to the client after authenticating, the client could receive the credentials that were originally sent in the body of the HTTP request to the authorization server.
+If an attacker tricks a victim to authenticate to the legitimate authorization server through a malicious client, the attacker could receive the credentials  \citep{fett_comprehensive_2016}.
+
+The 307 redirect attack is similar to a traditional phishing attack, where a victim is tricked to sign in to a malicious website, giving the attacker their credentials \citep{dhamija_why_2006}.
+The 307 redirect attack is more likely to succeed compared to a traditional phishing attack, as it can be much harder to distinguish from a legitimate authentication.
+In the attack, the victim authenticates to the legitimate authorization server, making it difficult to distinguish from a normal authentication.
+Additionally, tricking the victim to visit the malicious client could be achieved in one single click, without the victim visiting the malicious site at any point, instead directly being directed to the legitimate authorization server.
+As such, the victim does not have to miss subtle details in the login form that are slightly off, or mistake the malicious domain for a legitimate one as in traditional phishing attacks.
+
+To clarify that the request body should not be sent together with the redirection, the HTTP code 303 should be used, as it explicitly states that the body should not be included in the response \citep{fielding_http_2022}.
+Using a correct HTTP code does not solve the issue of sending credentials together with the client callback, as the authorization server can choose what content to send regardless of the status code used.
+While correctly dropping the request body will have to be implemented by the authorization server, by using a HTTP status code that explicitly states that the request body should be dropped, the likelihood for faulty implementations is lower, compared to the 307 code which explicitly states that the original request body should be included in the redirect.
+
+\subsubsection{Insecure token handling}
+Due to the central role of tokens in OAuth authorization flows, their secure handling is essential.
+In the authorization code flow the relevant tokens are access tokens, refresh tokens and authorization codes.
+To avoid leaked tokens being abused, each token should only be valid for a short amount of time.
+To extend the lifetime of user sessions and their corresponding access tokens, refresh tokens should be used.
+
+In the authorization code grant, authorization codes are used to request an access token from the authorization server.
+In a correct authorization code flow, the code should only be used once, and it should be used quickly after it has been granted.
+As such, to avoid replay attacks, the authorization server should only be valid for one request, and it should have a short expiry time \citep{yang_security_2013}.
+Additionally, if an authorization code is used multiple times, the authorization server should invalidate all related codes and tokens.
+As an authorization code should never be used more than once in a correct code flow, duplicate use implies that something has gone wrong in the client or that an attacker is attempting a replay attack.
+
+Refresh tokens should be dealt with similarly to authorization codes, being single use and only valid for a set amount of time.
+The expiration time for refresh tokens can be longer than that of authorization codes, and can vary based on the specific client.
+While the OAuth specification is quite clear in requiring the rotation of refresh tokens, Philippaerts et al. (2022) found that 44\% of authorization servers accept old refresh tokens that have already been used
+\citep{philippaerts_oauch_2022}.
+The old refresh tokens should be stored, and all related tokens should be invalidated if an old refresh token is used.
+Compared to storing one old authorization code to detect replay attacks, detecting old refresh tokens can require storing a significant amount of tokens.
+The large number of stored refresh tokens can require large amounts of storage, and the comparison to old refresh tokens can cause significant storage load \citep{darwish_evaluation_2015}.
+As such, developers should weigh the benefits of storing old refresh tokens with the costs when deciding how long old tokens should be stored for.
+
+\subsubsection{Redirect URI attack}
+As the generated authorization code and refresh and access tokens are sent to the redirection URI, the authorization server has to validate that the redirect URI is correct.
+The OAuth specification states that clients should register each allowed redirection URI, and that the authorization server should check the complete URI.
+In practice, the redirect URI validation can be implemented in a number of ways.
+While the minimum check should be to compare the complete redirect URI against a stored value, many authorization servers only check the origin of the redirect URI, allowing an attacker to change the path of the redirect URI \citep{matyas_your_2018}.
+For increased security, authorization servers can also generate client-specific redirect paths when a client registers.
+
+In the authorization code grant, the client sends the received authorization code to the authorization server to receive an access token.
+Clients typically define a separate redirect URI for each provider, such as \textit{/oauth/callback/google} and \textit{/oauth/callback/amazon}.
+If an attacker is able to tamper with the path of the redirection URI, with methods such as malicious images or iframes, the client could be tricked to send the code to the wrong provider \citep{matyas_your_2018}.
+If the client application has an XSS vulnerability at a certain path, an attacker could set that vulnerable path as the redirect URI.
+While OAuth tokens are generally secure against XSS as long as they are stored as HttpOnly cookies, if an attacker is able to execute code in the redirect flow they will be able to read the code or token that has been generated, as they are sent as query parameters to the client before being stored as a cookie.
+This allows attackers to impersonate the victim, or to access protected resources belonging to the victim.
+
+%\subsubsection{Clickjacking}
+%Malicious iframes
+
+%X-FRAME-OPTIONS DENY

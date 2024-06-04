@@ -1,0 +1,31 @@
+%% Force new page so that the Swedish abstract starts from a new page
+\newpage
+
+%% Swedish abstract. Delete it if you don't need it. 
+%% 
+%% Respecify those fields that differ from the earlier specification or simply
+%% respecify all fields.
+\thesistitle{Säkrande av webbklienter som utnyttjar OAuth 2.0}
+\supervisor{Prof.\ Antti Ylä-Jääski}
+\advisor{D.I. Karri Lehtiranta}
+\degreeprogram{Computer, Communication and Information Sciences}
+%\collaborativepartner{twoday}
+%\date{21.9.2023}
+%% Abstract keywords
+\keywords{OAuth 2.0, webbutveckling, säkerhet, autentisering,
+auktorisering}
+%% Abstract text
+\begin{abstractpage}[swedish]
+OAuth 2.0-specifikationen används ofta för att auktorisera applikationer att använda resurser som tillhör tredje parter och för att möjliggöra att användare autentiseras med samma konto i flera applikationer.
+Även om teknologin används i stor utsträckning ställer specifikationen få krav på utvecklare, vilket möjliggör många olika alternativ då teknologin implementeras.
+Denna brist på strikta krav gör det möjligt för varierande applikationer att utnyttja teknologin, men det leder också till att olika OAuth-system kan ha väldigt olika säkerhetsegenskaper.
+OAuth auktoriseringsservrar som upprätthålls av tredje parter utnyttjas ofta av utvecklare för autentisering, vilket leder till att utvecklare slipper implementera komplicerade inloggningssystem för att autentisera sina användare.
+Då utvecklare kan utnyttja OAuth servrar och implementera OAuth klienter utan djupare kunskap om teknologin är det lätt hänt att beslut om hur systemet ska implementeras tas utan att ta säkerhetskonsekvenserna i beaktande.
+Målet med denna avhandling är att presentera kända sårbarheter i OAuth-system och beskriva enkla steg som bör tas för att implementera specifikationen på ett säkert sätt.
+
+I denna avhandling presenteras ett antal sårbarheter av varierande allvarlighetsgrad som är vanliga i system som använder OAuth.
+Dessa sårbarheter orsakas ofta av felaktig implementering av OAuth-klienter och auktoriseringsservrar, men bristen på strikta krav i specifikationen som gör det möjligt att skapa osäkra applikationer utan att göra explicita fel är en lika vanlig källa till sårbarheter.
+Genom en praktisk implementation av en OAuth-klient som utnyttjar tredje parters auktoriseringsservrar visar denna avhandling att ett antal enkla steg kan tas för att minska många av de beskrivna sårbarheterna, ofta till en minimal kostnad och utan en betydande ökning av komplexitet.
+Det är dock inte alltid uppenbart om det säkraste alternativet är det optimala valet för ett visst system, exempelvis då man ska besluta om och hur användarsessioner ska bevaras, eftersom ett säkrare alternativ kan leda till en försämrad användarupplevelse.
+För att hjälpa utvecklare att anpassa OAuth-specifikationen till sin specifika applikation i enlighet med sina säkerhetskrav presenterar avhandlingen effekterna av olika beslut då OAuth-system implementeras och visar varför det ofta är värt besväret att vidta extra åtgärder för att göra system tillräckligt säkra.
+\end{abstractpage}
